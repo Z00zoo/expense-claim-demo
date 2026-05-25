@@ -1,8 +1,43 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+@{
+    ViewData["Title"] = "首頁";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="row align-items-start g-4">
+    <div class="col-lg-8">
+        <h1 class="h2 mb-3">簡易請款系統 Demo</h1>
+        <p class="text-muted">
+            目前已完成登入驗證、角色授權地基、SQLite 資料庫與 demo 帳號種子資料。
+        </p>
+
+        @if (User.Identity?.IsAuthenticated == true)
+        {
+            <div class="alert alert-success">
+                已登入：@User.FindFirst(System.Security.Claims.ClaimTypes.GivenName)?.Value
+                / 角色：@User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value
+            </div>
+        }
+        else
+        {
+            <a class="btn btn-primary" asp-controller="Account" asp-action="Login">登入系統</a>
+        }
+    </div>
+
+    <div class="col-lg-4">
+        <h2 class="h5">Demo 帳號</h2>
+        <table class="table table-sm">
+            <thead>
+                <tr>
+                    <th>帳號</th>
+                    <th>角色</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td>applicant</td><td>Applicant</td></tr>
+                <tr><td>approver</td><td>Approver</td></tr>
+                <tr><td>finance</td><td>Finance</td></tr>
+                <tr><td>admin</td><td>Admin</td></tr>
+            </tbody>
+        </table>
+        <p class="small text-muted">密碼皆為 <code>password</code></p>
+    </div>
 </div>
