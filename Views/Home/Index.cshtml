@@ -6,7 +6,7 @@
     <div class="col-lg-8">
         <h1 class="h2 mb-3">簡易請款系統 Demo</h1>
         <p class="text-muted">
-            目前已完成登入驗證、角色授權地基、SQLite 資料庫與 demo 帳號種子資料。
+            目前已完成登入驗證、請款表單 CRUD、SQLite 資料庫與 demo 帳號種子資料。
         </p>
 
         @if (User.Identity?.IsAuthenticated == true)
@@ -15,6 +15,7 @@
                 已登入：@User.FindFirst(System.Security.Claims.ClaimTypes.GivenName)?.Value
                 / 角色：@User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value
             </div>
+            <a class="btn btn-primary" asp-controller="ExpenseClaims" asp-action="Index">前往請款單</a>
         }
         else
         {

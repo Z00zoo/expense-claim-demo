@@ -1,0 +1,20 @@
+@model ExpenseClaimEditViewModel
+
+@{
+    ViewData["Title"] = "新增請款";
+}
+
+<h1 class="h3 mb-3">新增請款</h1>
+
+<form asp-action="Create" method="post" class="col-lg-7">
+    <partial name="_ExpenseClaimForm" model="Model" />
+
+    <div class="d-flex gap-2">
+        <button type="submit" class="btn btn-primary">儲存草稿</button>
+        <a class="btn btn-outline-secondary" asp-action="Index">取消</a>
+    </div>
+</form>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

@@ -1,0 +1,34 @@
+@model ExpenseClaimEditViewModel
+
+<div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+<div class="mb-3">
+    <label asp-for="ClaimDate" class="form-label"></label>
+    <input asp-for="ClaimDate" class="form-control" />
+    <span asp-validation-for="ClaimDate" class="text-danger"></span>
+</div>
+
+<div class="mb-3">
+    <label asp-for="Amount" class="form-label"></label>
+    <input asp-for="Amount" class="form-control" />
+    <span asp-validation-for="Amount" class="text-danger"></span>
+</div>
+
+<div class="mb-3">
+    <label asp-for="Category" class="form-label"></label>
+    <input asp-for="Category" class="form-control" list="category-options" />
+    <datalist id="category-options">
+        <option value="交通費"></option>
+        <option value="餐費"></option>
+        <option value="辦公用品"></option>
+        <option value="差旅費"></option>
+        <option value="其他"></option>
+    </datalist>
+    <span asp-validation-for="Category" class="text-danger"></span>
+</div>
+
+<div class="mb-3">
+    <label asp-for="Description" class="form-label"></label>
+    <textarea asp-for="Description" class="form-control" rows="5"></textarea>
+    <span asp-validation-for="Description" class="text-danger"></span>
+</div>

@@ -1,0 +1,57 @@
+@model IReadOnlyList<ExpenseClaim>
+
+@{
+    ViewData["Title"] = "我的請款單";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1 class="h3 mb-0">我的請款單</h1>
+    @if (User.IsInRole(AppRoles.Applicant) || User.IsInRole(AppRoles.Admin))
+    {
+        <a class="btn btn-primary" asp-action="Create">新增請款</a>
+    }
+</div>
+
+@if (TempData["StatusMessage"] is string message)
+{
+    <div class="alert alert-success">@message</div>
+}
+
+@if (Model.Count == 0)
+{
+    <div class="alert alert-info">目前沒有請款單。</div>
+}
+else
+{
+    <div class="table-responsive">
+        <table class="table table-hover align-middle">
+            <thead>
+                <tr>
+                    <th>單號</th>
+                    <th>日期</th>
+                    <th>類別</th>
+                    <th class="text-end">金額</th>
+                    <th>狀態</th>
+                    <th>申請人</th>
+                    <th class="text-end">操作</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var claim in Model)
+                {
+                    <tr>
+                        <td>@claim.ClaimNo</td>
+                        <td>@claim.ClaimDate.ToString("yyyy/MM/dd")</td>
+                        <td>@claim.Category</td>
+                        <td class="text-end">@claim.Amount.ToString("N0")</td>
+                        <td>@claim.Status</td>
+                        <td>@claim.Applicant?.DisplayName</td>
+                        <td class="text-end">
+                            <a class="btn btn-sm btn-outline-secondary" asp-action="Details" asp-route-id="@claim.Id">查看</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}

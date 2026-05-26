@@ -11,6 +11,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
 builder.Services.AddScoped<PasswordService>();
 builder.Services.AddScoped<AuthService>();
+builder.Services.AddScoped<ExpenseClaimService>();
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
     {
@@ -30,7 +31,7 @@ using (var scope = app.Services.CreateScope())
     var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
     var passwordService = scope.ServiceProvider.GetRequiredService<PasswordService>();
 
-    dbContext.Database.EnsureCreated();
+    DatabaseInitializer.EnsureSchema(dbContext);
     SeedData.Initialize(dbContext, passwordService);
 }
 
