@@ -1,0 +1,87 @@
+@model ClaimSearchViewModel
+
+@{
+    ViewData["Title"] = "案件搜尋";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1 class="h3 mb-0">案件搜尋</h1>
+    <a class="btn btn-outline-secondary" asp-controller="Home" asp-action="Index">回首頁</a>
+</div>
+
+<form method="get" class="row g-3 align-items-end mb-4">
+    <div class="col-md-2">
+        <label asp-for="Status" class="form-label"></label>
+        <select asp-for="Status" class="form-select">
+            <option value="">全部</option>
+            @foreach (var status in Enum.GetValues<ExpenseClaimStatus>())
+            {
+                <option value="@status">@status.ToDisplayName()</option>
+            }
+        </select>
+    </div>
+    <div class="col-md-2">
+        <label asp-for="ApplicantId" class="form-label"></label>
+        <select asp-for="ApplicantId" class="form-select">
+            <option value="">全部</option>
+            @foreach (var applicant in Model.Applicants)
+            {
+                <option value="@applicant.Id">@applicant.DisplayName</option>
+            }
+        </select>
+    </div>
+    <div class="col-md-2">
+        <label asp-for="FromDate" class="form-label"></label>
+        <input asp-for="FromDate" class="form-control" />
+    </div>
+    <div class="col-md-2">
+        <label asp-for="ToDate" class="form-label"></label>
+        <input asp-for="ToDate" class="form-control" />
+    </div>
+    <div class="col-md-3">
+        <label asp-for="Keyword" class="form-label"></label>
+        <input asp-for="Keyword" class="form-control" placeholder="單號、類別、說明或申請人" />
+    </div>
+    <div class="col-md-1 d-grid">
+        <button type="submit" class="btn btn-primary">搜尋</button>
+    </div>
+</form>
+
+@if (Model.Claims.Count == 0)
+{
+    <div class="alert alert-info">查無符合條件的請款單。</div>
+}
+else
+{
+    <div class="table-responsive">
+        <table class="table table-hover align-middle">
+            <thead>
+                <tr>
+                    <th>單號</th>
+                    <th>申請人</th>
+                    <th>日期</th>
+                    <th>類別</th>
+                    <th class="text-end">金額</th>
+                    <th>狀態</th>
+                    <th class="text-end">操作</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var claim in Model.Claims)
+                {
+                    <tr>
+                        <td>@claim.ClaimNo</td>
+                        <td>@claim.Applicant?.DisplayName</td>
+                        <td>@claim.ClaimDate.ToString("yyyy/MM/dd")</td>
+                        <td>@claim.Category</td>
+                        <td class="text-end">@claim.Amount.ToString("N0")</td>
+                        <td><span class="badge @claim.Status.ToBadgeClass()">@claim.Status.ToDisplayName()</span></td>
+                        <td class="text-end">
+                            <a class="btn btn-sm btn-outline-secondary" asp-controller="ExpenseClaims" asp-action="Details" asp-route-id="@claim.Id">查看</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}

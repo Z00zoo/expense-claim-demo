@@ -97,6 +97,11 @@ public class ApprovalService(ApplicationDbContext dbContext)
 
     public async Task<bool> RejectAsync(int id, int actorId, string role, string? comment)
     {
+        if (string.IsNullOrWhiteSpace(comment))
+        {
+            return false;
+        }
+
         var claim = await dbContext.ExpenseClaims.SingleOrDefaultAsync(item => item.Id == id);
         if (claim is null || !CanReject(claim, role))
         {

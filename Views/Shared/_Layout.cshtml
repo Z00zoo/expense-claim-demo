@@ -34,6 +34,12 @@
                                     <a class="nav-link text-dark" asp-controller="Approvals" asp-action="Pending">待簽請款</a>
                                 </li>
                             }
+                            @if (User.IsInRole(AppRoles.Admin))
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link text-dark" asp-controller="Admin" asp-action="Claims">案件搜尋</a>
+                                </li>
+                            }
                         }
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">說明</a>

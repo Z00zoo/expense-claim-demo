@@ -55,6 +55,12 @@ public class ApprovalsController(ApprovalService approvalService) : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Reject(ApprovalDecisionViewModel model)
     {
+        if (string.IsNullOrWhiteSpace(model.Comment))
+        {
+            TempData["ErrorMessage"] = "退回請款單時必須填寫備註。";
+            return RedirectToAction(nameof(Review), new { id = model.ExpenseClaimId });
+        }
+
         if (!ModelState.IsValid)
         {
             return RedirectToAction(nameof(Review), new { id = model.ExpenseClaimId });

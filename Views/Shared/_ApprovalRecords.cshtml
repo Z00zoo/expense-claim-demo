@@ -22,7 +22,7 @@ else
                     <tr>
                         <td>@record.CreatedAt.ToLocalTime().ToString("yyyy/MM/dd HH:mm")</td>
                         <td>@record.Actor?.DisplayName</td>
-                        <td>@record.Action</td>
+                        <td>@record.Action.ToDisplayName()</td>
                         <td>@record.Comment</td>
                     </tr>
                 }

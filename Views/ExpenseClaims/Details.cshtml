@@ -10,15 +10,10 @@
 <div class="d-flex justify-content-between align-items-start mb-3">
     <div>
         <h1 class="h3 mb-1">請款單 @Model.ClaimNo</h1>
-        <div class="text-muted">狀態：@Model.Status</div>
+        <div class="text-muted">狀態：<span class="badge @Model.Status.ToBadgeClass()">@Model.Status.ToDisplayName()</span></div>
     </div>
     <a class="btn btn-outline-secondary" asp-action="Index">返回清單</a>
 </div>
-
-<hr class="my-4" />
-
-<h2 class="h5">簽核紀錄</h2>
-<partial name="_ApprovalRecords" model="Model.ApprovalRecords" />
 
 @if (TempData["StatusMessage"] is string message)
 {
@@ -72,3 +67,8 @@
         <a class="btn btn-outline-danger" asp-action="Delete" asp-route-id="@Model.Id">刪除</a>
     }
 </div>
+
+<hr class="my-4" />
+
+<h2 class="h5">簽核紀錄</h2>
+<partial name="_ApprovalRecords" model="Model.ApprovalRecords" />

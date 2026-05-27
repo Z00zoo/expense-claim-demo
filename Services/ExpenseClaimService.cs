@@ -6,6 +6,76 @@ namespace Demo.Services;
 
 public class ExpenseClaimService(ApplicationDbContext dbContext)
 {
+    public async Task<DashboardViewModel> GetDashboardAsync(int userId, string role)
+    {
+        var claims = await dbContext.ExpenseClaims
+            .Include(claim => claim.Applicant)
+            .OrderByDescending(claim => claim.UpdatedAt)
+            .ToListAsync();
+
+        var visibleClaims = role == AppRoles.Admin
+            ? claims
+            : claims.Where(claim => claim.ApplicantId == userId).ToList();
+
+        var model = new DashboardViewModel
+        {
+            Role = role,
+            RecentClaims = visibleClaims.Take(5).ToList()
+        };
+
+        if (role == AppRoles.Applicant)
+        {
+            model.Metrics.AddRange(
+            [
+                new() { Label = "草稿", Count = visibleClaims.Count(claim => claim.Status == ExpenseClaimStatus.Draft), Status = ExpenseClaimStatus.Draft },
+                new() { Label = "簽核中", Count = visibleClaims.Count(claim => claim.Status is ExpenseClaimStatus.Submitted or ExpenseClaimStatus.ManagerApproved or ExpenseClaimStatus.FinanceApproved) },
+                new() { Label = "已退回", Count = visibleClaims.Count(claim => claim.Status == ExpenseClaimStatus.Rejected), Status = ExpenseClaimStatus.Rejected },
+                new() { Label = "已付款", Count = visibleClaims.Count(claim => claim.Status == ExpenseClaimStatus.Paid), Status = ExpenseClaimStatus.Paid }
+            ]);
+        }
+        else if (role == AppRoles.Approver)
+        {
+            var pendingClaims = claims.Where(claim => claim.Status == ExpenseClaimStatus.Submitted).ToList();
+            model.ActionClaims = pendingClaims.Take(5).ToList();
+            model.RecentClaims = model.ActionClaims;
+            model.Metrics.Add(new DashboardMetricViewModel
+            {
+                Label = "待主管簽核",
+                Count = pendingClaims.Count,
+                Status = ExpenseClaimStatus.Submitted
+            });
+        }
+        else if (role == AppRoles.Finance)
+        {
+            model.ActionClaims = claims
+                .Where(claim => claim.Status is ExpenseClaimStatus.ManagerApproved or ExpenseClaimStatus.FinanceApproved)
+                .Take(5)
+                .ToList();
+            model.RecentClaims = model.ActionClaims;
+            model.Metrics.AddRange(
+            [
+                new() { Label = "待財務簽核", Count = claims.Count(claim => claim.Status == ExpenseClaimStatus.ManagerApproved), Status = ExpenseClaimStatus.ManagerApproved },
+                new() { Label = "待付款", Count = claims.Count(claim => claim.Status == ExpenseClaimStatus.FinanceApproved), Status = ExpenseClaimStatus.FinanceApproved }
+            ]);
+        }
+        else if (role == AppRoles.Admin)
+        {
+            model.Metrics.AddRange(Enum.GetValues<ExpenseClaimStatus>()
+                .Select(status => new DashboardMetricViewModel
+                {
+                    Label = status.ToDisplayName(),
+                    Count = claims.Count(claim => claim.Status == status),
+                    Status = status
+                }));
+            model.ActionClaims = claims
+                .Where(claim => claim.Status is ExpenseClaimStatus.Submitted or ExpenseClaimStatus.ManagerApproved or ExpenseClaimStatus.FinanceApproved)
+                .Take(5)
+                .ToList();
+        }
+
+        return model;
+    }
+
     public async Task<List<ExpenseClaim>> GetClaimsForUserAsync(int userId, string role)
     {
         var query = dbContext.ExpenseClaims
@@ -16,6 +86,54 @@ public class ExpenseClaimService(ApplicationDbContext dbContext)
         if (role != AppRoles.Admin)
         {
             query = query.Where(claim => claim.ApplicantId == userId);
+        }
+
+        return await query.ToListAsync();
+    }
+
+    public async Task<List<AppUser>> GetApplicantsAsync()
+    {
+        return await dbContext.Users
+            .OrderBy(user => user.DisplayName)
+            .ToListAsync();
+    }
+
+    public async Task<List<ExpenseClaim>> SearchClaimsAsync(ClaimSearchViewModel model)
+    {
+        var query = dbContext.ExpenseClaims
+            .Include(claim => claim.Applicant)
+            .OrderByDescending(claim => claim.ClaimDate)
+            .ThenByDescending(claim => claim.UpdatedAt)
+            .AsQueryable();
+
+        if (model.Status.HasValue)
+        {
+            query = query.Where(claim => claim.Status == model.Status.Value);
+        }
+
+        if (model.ApplicantId.HasValue)
+        {
+            query = query.Where(claim => claim.ApplicantId == model.ApplicantId.Value);
+        }
+
+        if (model.FromDate.HasValue)
+        {
+            query = query.Where(claim => claim.ClaimDate >= model.FromDate.Value.Date);
+        }
+
+        if (model.ToDate.HasValue)
+        {
+            query = query.Where(claim => claim.ClaimDate <= model.ToDate.Value.Date);
+        }
+
+        var keyword = model.Keyword?.Trim();
+        if (!string.IsNullOrWhiteSpace(keyword))
+        {
+            query = query.Where(claim =>
+                claim.ClaimNo.Contains(keyword)
+                || claim.Category.Contains(keyword)
+                || claim.Description.Contains(keyword)
+                || (claim.Applicant != null && claim.Applicant.DisplayName.Contains(keyword)));
         }
 
         return await query.ToListAsync();

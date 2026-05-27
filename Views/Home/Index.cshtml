@@ -1,3 +1,5 @@
+@model DashboardViewModel?
+
 @{
     ViewData["Title"] = "首頁";
 }
@@ -5,24 +7,121 @@
 <div class="row align-items-start g-4">
     <div class="col-lg-8">
         <h1 class="h2 mb-3">簡易請款系統 Demo</h1>
-        <p class="text-muted">
-            目前已完成登入驗證、請款表單 CRUD、主管/財務簽核流程與 demo 帳號種子資料。
-        </p>
 
-        @if (User.Identity?.IsAuthenticated == true)
+        @if (User.Identity?.IsAuthenticated == true && Model is not null)
         {
-            <div class="alert alert-success">
-                已登入：@User.FindFirst(System.Security.Claims.ClaimTypes.GivenName)?.Value
-                / 角色：@User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <div class="text-muted">
+                    @User.FindFirst(System.Security.Claims.ClaimTypes.GivenName)?.Value
+                    / @User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value
+                </div>
+                <div>
+                    <a class="btn btn-primary" asp-controller="ExpenseClaims" asp-action="Index">請款單</a>
+                    @if (User.IsInRole(AppRoles.Approver) || User.IsInRole(AppRoles.Finance) || User.IsInRole(AppRoles.Admin))
+                    {
+                        <a class="btn btn-outline-primary ms-2" asp-controller="Approvals" asp-action="Pending">待簽</a>
+                    }
+                    @if (User.IsInRole(AppRoles.Admin))
+                    {
+                        <a class="btn btn-outline-secondary ms-2" asp-controller="Admin" asp-action="Claims">案件搜尋</a>
+                    }
+                </div>
             </div>
-            <a class="btn btn-primary" asp-controller="ExpenseClaims" asp-action="Index">前往請款單</a>
-            @if (User.IsInRole(AppRoles.Approver) || User.IsInRole(AppRoles.Finance) || User.IsInRole(AppRoles.Admin))
+
+            <div class="row g-3 mb-4">
+                @foreach (var metric in Model.Metrics)
+                {
+                    <div class="col-sm-6 col-xl-3">
+                        <div class="border rounded p-3 h-100">
+                            <div class="text-muted small">@metric.Label</div>
+                            <div class="display-6">@metric.Count</div>
+                        </div>
+                    </div>
+                }
+            </div>
+
+            @if (Model.ActionClaims.Count > 0)
             {
-                <a class="btn btn-outline-primary ms-2" asp-controller="Approvals" asp-action="Pending">前往待簽</a>
+                <h2 class="h5">待處理案件</h2>
+                <div class="table-responsive mb-4">
+                    <table class="table table-sm align-middle">
+                        <thead>
+                            <tr>
+                                <th>單號</th>
+                                <th>申請人</th>
+                                <th>日期</th>
+                                <th class="text-end">金額</th>
+                                <th>狀態</th>
+                                <th class="text-end">操作</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var claim in Model.ActionClaims)
+                            {
+                                <tr>
+                                    <td>@claim.ClaimNo</td>
+                                    <td>@claim.Applicant?.DisplayName</td>
+                                    <td>@claim.ClaimDate.ToString("yyyy/MM/dd")</td>
+                                    <td class="text-end">@claim.Amount.ToString("N0")</td>
+                                    <td><span class="badge @claim.Status.ToBadgeClass()">@claim.Status.ToDisplayName()</span></td>
+                                    <td class="text-end">
+                                        <a class="btn btn-sm btn-outline-primary" asp-controller="Approvals" asp-action="Review" asp-route-id="@claim.Id">處理</a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+
+            <h2 class="h5">最近請款</h2>
+            @if (Model.RecentClaims.Count == 0)
+            {
+                <div class="alert alert-info">目前沒有請款單。</div>
+            }
+            else
+            {
+                <div class="table-responsive">
+                    <table class="table table-sm align-middle">
+                        <thead>
+                            <tr>
+                                <th>單號</th>
+                                <th>日期</th>
+                                <th class="text-end">金額</th>
+                                <th>狀態</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var claim in Model.RecentClaims)
+                            {
+                                var usesApprovalReview = User.IsInRole(AppRoles.Approver) || User.IsInRole(AppRoles.Finance);
+
+                                <tr>
+                                    <td>
+                                        @if (usesApprovalReview)
+                                        {
+                                            <a asp-controller="Approvals" asp-action="Review" asp-route-id="@claim.Id">@claim.ClaimNo</a>
+                                        }
+                                        else
+                                        {
+                                            <a asp-controller="ExpenseClaims" asp-action="Details" asp-route-id="@claim.Id">@claim.ClaimNo</a>
+                                        }
+                                    </td>
+                                    <td>@claim.ClaimDate.ToString("yyyy/MM/dd")</td>
+                                    <td class="text-end">@claim.Amount.ToString("N0")</td>
+                                    <td><span class="badge @claim.Status.ToBadgeClass()">@claim.Status.ToDisplayName()</span></td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
             }
         }
         else
         {
+            <p class="text-muted">
+                目前已完成登入驗證、請款表單 CRUD、主管/財務簽核流程與 demo 帳號種子資料。
+            </p>
             <a class="btn btn-primary" asp-controller="Account" asp-action="Login">登入系統</a>
         }
     </div>

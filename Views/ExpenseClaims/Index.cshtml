@@ -44,7 +44,7 @@ else
                         <td>@claim.ClaimDate.ToString("yyyy/MM/dd")</td>
                         <td>@claim.Category</td>
                         <td class="text-end">@claim.Amount.ToString("N0")</td>
-                        <td>@claim.Status</td>
+                        <td><span class="badge @claim.Status.ToBadgeClass()">@claim.Status.ToDisplayName()</span></td>
                         <td>@claim.Applicant?.DisplayName</td>
                         <td class="text-end">
                             <a class="btn btn-sm btn-outline-secondary" asp-action="Details" asp-route-id="@claim.Id">查看</a>

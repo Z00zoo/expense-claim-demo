@@ -11,10 +11,15 @@
 <div class="d-flex justify-content-between align-items-start mb-3">
     <div>
         <h1 class="h3 mb-1">簽核請款 @Model.ClaimNo</h1>
-        <div class="text-muted">狀態：@Model.Status</div>
+        <div class="text-muted">狀態：<span class="badge @Model.Status.ToBadgeClass()">@Model.Status.ToDisplayName()</span></div>
     </div>
     <a class="btn btn-outline-secondary" asp-action="Pending">返回待簽</a>
 </div>
+
+@if (TempData["ErrorMessage"] is string errorMessage)
+{
+    <div class="alert alert-danger">@errorMessage</div>
+}
 
 <dl class="row">
     <dt class="col-sm-2">申請人</dt>
@@ -34,11 +39,17 @@
 </dl>
 
 <form method="post" class="col-lg-7">
+    @Html.AntiForgeryToken()
+    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
     <input name="ExpenseClaimId" type="hidden" value="@Model.Id" />
 
     <div class="mb-3">
         <label for="Comment" class="form-label">備註</label>
         <textarea id="Comment" name="Comment" class="form-control" rows="4"></textarea>
+        @if (canReject)
+        {
+            <div class="form-text">退回時必須填寫備註。</div>
+        }
     </div>
 
     <div class="d-flex gap-2 mb-4">

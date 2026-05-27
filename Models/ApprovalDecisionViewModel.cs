@@ -8,5 +8,5 @@ public class ApprovalDecisionViewModel
 
     [StringLength(500)]
     [Display(Name = "備註")]
-    public string Comment { get; set; } = string.Empty;
+    public string? Comment { get; set; }
 }
