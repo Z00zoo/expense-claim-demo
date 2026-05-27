@@ -19,6 +19,10 @@ The project already has:
 - Finance approval
 - Mark as paid
 - Approval records
+- Localized status and approval action labels
+- Role-based dashboard
+- Admin claim search
+- Required rejection comments
 
 Demo accounts all use password `password`:
 - applicant
@@ -39,11 +43,22 @@ App_Data/claims-demo.db
 The database and build outputs are ignored by git.
 
 Next stage:
-- Implement status localization
-- Implement a role-based dashboard
-- Implement an Admin claim search page
-- Optionally implement Admin user management
-- Improve UX/data quality, especially requiring comments on rejection
+- Implement Admin user management:
+  - list demo users
+  - update role
+  - activate/deactivate accounts
+- Improve formatting consistency:
+  - culture-aware currency formatting
+  - local time handling across list, detail, dashboard, and approval views
+- Polish Admin claim search:
+  - validate date ranges
+  - consider restricting applicant filter to applicant users
+  - add paging or result limits
+  - make dashboard metrics link to filtered lists
+- Harden workflow behavior:
+  - add tests for status transitions and authorization rules
+  - make claim number generation safer under concurrent submissions
+  - decide how Admin-created claims should assign applicant ownership
 
 Keep the existing architecture:
 - Controllers for MVC actions

@@ -20,6 +20,10 @@ ASP.NET Core MVC demo project for a simple expense claim system.
 - Finance approval
 - Mark claim as paid
 - Approval history on claim details
+- Localized claim status labels
+- Role-based dashboard for applicants, approvers, finance, and admins
+- Admin claim search with status, applicant, date range, and keyword filters
+- Rejection comments required during approval review
 
 ## Demo Accounts
 
@@ -64,6 +68,7 @@ The local database files are ignored by git. A fresh clone will recreate the dat
 4. Log in as `approver` and approve the submitted claim.
 5. Log in as `finance` and approve the manager-approved claim.
 6. Log in as `finance` and mark the claim as paid.
+7. Log in as `admin` to review dashboard counts and search claims.
 
 ## Project Structure
 
