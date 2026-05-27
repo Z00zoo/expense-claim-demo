@@ -1,0 +1,32 @@
+@model IReadOnlyList<ApprovalRecord>
+
+@if (Model.Count == 0)
+{
+    <div class="alert alert-light border">尚無簽核紀錄。</div>
+}
+else
+{
+    <div class="table-responsive">
+        <table class="table table-sm align-middle">
+            <thead>
+                <tr>
+                    <th>時間</th>
+                    <th>動作人</th>
+                    <th>動作</th>
+                    <th>備註</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var record in Model.OrderBy(record => record.CreatedAt))
+                {
+                    <tr>
+                        <td>@record.CreatedAt.ToLocalTime().ToString("yyyy/MM/dd HH:mm")</td>
+                        <td>@record.Actor?.DisplayName</td>
+                        <td>@record.Action</td>
+                        <td>@record.Comment</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}

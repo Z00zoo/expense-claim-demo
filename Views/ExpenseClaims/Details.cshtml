@@ -15,6 +15,11 @@
     <a class="btn btn-outline-secondary" asp-action="Index">返回清單</a>
 </div>
 
+<hr class="my-4" />
+
+<h2 class="h5">簽核紀錄</h2>
+<partial name="_ApprovalRecords" model="Model.ApprovalRecords" />
+
 @if (TempData["StatusMessage"] is string message)
 {
     <div class="alert alert-success">@message</div>

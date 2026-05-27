@@ -31,5 +31,25 @@ public static class DatabaseInitializer
             CREATE INDEX IF NOT EXISTS "IX_ExpenseClaims_ApplicantId"
             ON "ExpenseClaims" ("ApplicantId");
             """);
+        dbContext.Database.ExecuteSqlRaw("""
+            CREATE TABLE IF NOT EXISTS "ApprovalRecords" (
+                "Id" INTEGER NOT NULL CONSTRAINT "PK_ApprovalRecords" PRIMARY KEY AUTOINCREMENT,
+                "ExpenseClaimId" INTEGER NOT NULL,
+                "ActorId" INTEGER NOT NULL,
+                "Action" TEXT NOT NULL,
+                "Comment" TEXT NOT NULL,
+                "CreatedAt" TEXT NOT NULL,
+                CONSTRAINT "FK_ApprovalRecords_ExpenseClaims_ExpenseClaimId" FOREIGN KEY ("ExpenseClaimId") REFERENCES "ExpenseClaims" ("Id") ON DELETE CASCADE,
+                CONSTRAINT "FK_ApprovalRecords_Users_ActorId" FOREIGN KEY ("ActorId") REFERENCES "Users" ("Id") ON DELETE RESTRICT
+            );
+            """);
+        dbContext.Database.ExecuteSqlRaw("""
+            CREATE INDEX IF NOT EXISTS "IX_ApprovalRecords_ExpenseClaimId"
+            ON "ApprovalRecords" ("ExpenseClaimId");
+            """);
+        dbContext.Database.ExecuteSqlRaw("""
+            CREATE INDEX IF NOT EXISTS "IX_ApprovalRecords_ActorId"
+            ON "ApprovalRecords" ("ActorId");
+            """);
     }
 }

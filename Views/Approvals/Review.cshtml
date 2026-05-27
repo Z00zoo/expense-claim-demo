@@ -1,0 +1,61 @@
+@model ExpenseClaim
+
+@{
+    ViewData["Title"] = "簽核請款";
+    var role = User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value ?? string.Empty;
+    var canApprove = ApprovalService.CanApprove(Model, role);
+    var canReject = ApprovalService.CanReject(Model, role);
+    var canMarkAsPaid = ApprovalService.CanMarkAsPaid(Model, role);
+}
+
+<div class="d-flex justify-content-between align-items-start mb-3">
+    <div>
+        <h1 class="h3 mb-1">簽核請款 @Model.ClaimNo</h1>
+        <div class="text-muted">狀態：@Model.Status</div>
+    </div>
+    <a class="btn btn-outline-secondary" asp-action="Pending">返回待簽</a>
+</div>
+
+<dl class="row">
+    <dt class="col-sm-2">申請人</dt>
+    <dd class="col-sm-10">@Model.Applicant?.DisplayName</dd>
+
+    <dt class="col-sm-2">請款日期</dt>
+    <dd class="col-sm-10">@Model.ClaimDate.ToString("yyyy/MM/dd")</dd>
+
+    <dt class="col-sm-2">金額</dt>
+    <dd class="col-sm-10">@Model.Amount.ToString("N0")</dd>
+
+    <dt class="col-sm-2">類別</dt>
+    <dd class="col-sm-10">@Model.Category</dd>
+
+    <dt class="col-sm-2">說明</dt>
+    <dd class="col-sm-10">@Model.Description</dd>
+</dl>
+
+<form method="post" class="col-lg-7">
+    <input name="ExpenseClaimId" type="hidden" value="@Model.Id" />
+
+    <div class="mb-3">
+        <label for="Comment" class="form-label">備註</label>
+        <textarea id="Comment" name="Comment" class="form-control" rows="4"></textarea>
+    </div>
+
+    <div class="d-flex gap-2 mb-4">
+        @if (canApprove)
+        {
+            <button type="submit" class="btn btn-success" asp-action="Approve">核准</button>
+        }
+        @if (canReject)
+        {
+            <button type="submit" class="btn btn-outline-danger" asp-action="Reject">退回</button>
+        }
+        @if (canMarkAsPaid)
+        {
+            <button type="submit" class="btn btn-primary" asp-action="MarkAsPaid">標記已付款</button>
+        }
+    </div>
+</form>
+
+<h2 class="h5">簽核紀錄</h2>
+<partial name="_ApprovalRecords" model="Model.ApprovalRecords" />

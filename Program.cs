@@ -12,6 +12,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 builder.Services.AddScoped<PasswordService>();
 builder.Services.AddScoped<AuthService>();
 builder.Services.AddScoped<ExpenseClaimService>();
+builder.Services.AddScoped<ApprovalService>();
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
     {

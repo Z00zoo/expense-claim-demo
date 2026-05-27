@@ -47,4 +47,6 @@ public class ExpenseClaim
 
     [Display(Name = "送出時間")]
     public DateTime? SubmittedAt { get; set; }
+
+    public List<ApprovalRecord> ApprovalRecords { get; set; } = [];
 }

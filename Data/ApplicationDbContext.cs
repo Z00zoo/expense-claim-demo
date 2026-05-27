@@ -7,6 +7,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
 {
     public DbSet<AppUser> Users => Set<AppUser>();
     public DbSet<ExpenseClaim> ExpenseClaims => Set<ExpenseClaim>();
+    public DbSet<ApprovalRecord> ApprovalRecords => Set<ApprovalRecord>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -31,6 +32,20 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
             entity.HasOne(claim => claim.Applicant)
                 .WithMany()
                 .HasForeignKey(claim => claim.ApplicantId)
+                .OnDelete(DeleteBehavior.Restrict);
+        });
+
+        modelBuilder.Entity<ApprovalRecord>(entity =>
+        {
+            entity.Property(record => record.Action).HasConversion<string>().HasMaxLength(30);
+            entity.Property(record => record.Comment).HasMaxLength(500);
+            entity.HasOne(record => record.ExpenseClaim)
+                .WithMany(claim => claim.ApprovalRecords)
+                .HasForeignKey(record => record.ExpenseClaimId)
+                .OnDelete(DeleteBehavior.Cascade);
+            entity.HasOne(record => record.Actor)
+                .WithMany()
+                .HasForeignKey(record => record.ActorId)
                 .OnDelete(DeleteBehavior.Restrict);
         });
     }

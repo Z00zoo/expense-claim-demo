@@ -6,7 +6,7 @@
     <div class="col-lg-8">
         <h1 class="h2 mb-3">簡易請款系統 Demo</h1>
         <p class="text-muted">
-            目前已完成登入驗證、請款表單 CRUD、SQLite 資料庫與 demo 帳號種子資料。
+            目前已完成登入驗證、請款表單 CRUD、主管/財務簽核流程與 demo 帳號種子資料。
         </p>
 
         @if (User.Identity?.IsAuthenticated == true)
@@ -16,6 +16,10 @@
                 / 角色：@User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value
             </div>
             <a class="btn btn-primary" asp-controller="ExpenseClaims" asp-action="Index">前往請款單</a>
+            @if (User.IsInRole(AppRoles.Approver) || User.IsInRole(AppRoles.Finance) || User.IsInRole(AppRoles.Admin))
+            {
+                <a class="btn btn-outline-primary ms-2" asp-controller="Approvals" asp-action="Pending">前往待簽</a>
+            }
         }
         else
         {

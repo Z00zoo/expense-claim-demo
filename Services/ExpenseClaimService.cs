@@ -25,6 +25,8 @@ public class ExpenseClaimService(ApplicationDbContext dbContext)
     {
         var claim = await dbContext.ExpenseClaims
             .Include(item => item.Applicant)
+            .Include(item => item.ApprovalRecords.OrderBy(record => record.CreatedAt))
+                .ThenInclude(record => record.Actor)
             .SingleOrDefaultAsync(item => item.Id == id);
 
         if (claim is null || !CanView(claim, userId, role))
@@ -98,6 +100,14 @@ public class ExpenseClaimService(ApplicationDbContext dbContext)
         claim.Status = ExpenseClaimStatus.Submitted;
         claim.SubmittedAt = DateTime.UtcNow;
         claim.UpdatedAt = DateTime.UtcNow;
+        dbContext.ApprovalRecords.Add(new ApprovalRecord
+        {
+            ExpenseClaimId = claim.Id,
+            ActorId = userId,
+            Action = ApprovalAction.Submitted,
+            Comment = "送出請款申請",
+            CreatedAt = DateTime.UtcNow
+        });
 
         await dbContext.SaveChangesAsync();
         return true;
