@@ -1,73 +1,89 @@
-# Codex Handoff Prompt
+# Codex 交接 prompt
 
-Use this prompt when asking another Codex environment to continue development.
+需要請另一個 Codex 環境接手時，可以使用下面這段 prompt。
 
 ```text
-This is a .NET 8 ASP.NET Core MVC simple expense claim demo.
+這是一個 .NET 8 ASP.NET Core MVC 簡易請款系統 demo。
 
-Read these files first:
+請先閱讀這些檔案：
 - README.md
 - HANDOFF.md
+- CODEX_PROMPT.md
 - git log --oneline
 
-The project already has:
+專案目前已有：
 - Cookie login authentication
-- Demo users and roles
-- Expense claim CRUD
-- Submit workflow
-- Manager approval
-- Finance approval
-- Mark as paid
+- Demo users 與 roles
+- 請款單 CRUD
+- 請款單送出流程
+- 主管核准
+- 財務核准
+- 標記付款完成
 - Approval records
-- Localized status and approval action labels
-- Role-based dashboard
+- 請款狀態與簽核動作的中文顯示
+- 依角色顯示的 dashboard
 - Admin claim search
-- Required rejection comments
+- 退回請款單時必填備註
+- 一致的日期、local time 與金額顯示
+- 重要流程動作的輕量 logging
 
-Demo accounts all use password `password`:
+Demo 帳號密碼皆為 `password`：
 - applicant
 - approver
 - finance
 - admin
 
-Run locally with:
+本機執行：
 
 dotnet restore
 dotnet build
 dotnet run --urls http://localhost:5100
 
-The SQLite database is generated automatically at:
+SQLite 資料庫會自動產生在：
 
 App_Data/claims-demo.db
 
-The database and build outputs are ignored by git.
+資料庫與 build output 已由 git 忽略。
 
-Next stage:
-- Implement Admin user management:
+目前專案已足夠作為面試 demo。除非使用者明確要求，請不要擴大系統範圍。
+
+可以考慮的後續小範圍工作：
+- Admin user management：
   - list demo users
   - update role
   - activate/deactivate accounts
-- Improve formatting consistency:
-  - culture-aware currency formatting
-  - local time handling across list, detail, dashboard, and approval views
-- Polish Admin claim search:
+- Admin claim search polish：
   - validate date ranges
   - consider restricting applicant filter to applicant users
   - add paging or result limits
   - make dashboard metrics link to filtered lists
-- Harden workflow behavior:
+- Workflow hardening：
   - add tests for status transitions and authorization rules
   - make claim number generation safer under concurrent submissions
   - decide how Admin-created claims should assign applicant ownership
+- Documentation：
+  - keep README.md, HANDOFF.md, and CODEX_PROMPT.md synchronized after each feature stage
 
-Keep the existing architecture:
-- Controllers for MVC actions
-- Services for business rules
-- Data for EF Core DbContext, seed data, and schema initialization
-- Models for entities, enums, and view models
-- Views for Razor pages
+保持既有架構：
+- Controllers 處理 MVC actions
+- Services 放 business rules
+- Data 放 EF Core DbContext、seed data、schema initialization
+- Models 放 entities、enums、view models
+- Views 放 Razor pages
 
-Before editing, inspect the current files and git status.
-After editing, run dotnet build and verify the key workflow still works.
-Do not commit unless explicitly asked.
+不要引入：
+- ASP.NET Identity
+- CQRS
+- MediatR
+- Generic Repository
+- UnitOfWork
+- Clean Architecture restructuring
+- Multi-role authorization tables
+- Attachment upload
+- Email notifications
+- Large new features
+
+開始修改前，請先檢查目前檔案與 git status。
+修改後，請執行 dotnet build，並確認主要 demo flow 沒有壞掉。
+除非使用者明確要求，請不要 commit。
 ```
