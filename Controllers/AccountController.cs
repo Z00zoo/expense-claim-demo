@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Demo.Controllers;
 
 [AllowAnonymous]
-public class AccountController(AuthService authService) : Controller
+public class AccountController(AuthService authService, ILogger<AccountController> logger) : Controller
 {
     [HttpGet]
     public IActionResult Login(string? returnUrl = null)
@@ -34,6 +34,7 @@ public class AccountController(AuthService authService) : Controller
         var user = await authService.ValidateUserAsync(model.UserName, model.Password);
         if (user is null)
         {
+            logger.LogWarning("Login failed for user {UserName}", model.UserName.Trim());
             ModelState.AddModelError(string.Empty, "帳號或密碼不正確。");
             return View(model);
         }
@@ -55,6 +56,8 @@ public class AccountController(AuthService authService) : Controller
         };
 
         await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal, properties);
+
+        logger.LogInformation("Login succeeded for user {UserId} ({UserName}) with role {Role}", user.Id, user.UserName, user.Role);
 
         return RedirectToLocal(model.ReturnUrl);
     }

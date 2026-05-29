@@ -70,6 +70,27 @@ The local database files are ignored by git. A fresh clone will recreate the dat
 6. Log in as `finance` and mark the claim as paid.
 7. Log in as `admin` to review dashboard counts and search claims.
 
+## Design Decisions
+
+This demo intentionally keeps the architecture small and interview-friendly. It avoids CQRS, MediatR, Generic Repository, Unit of Work, and broad Clean Architecture restructuring because those patterns would add ceremony without improving the core demo flow.
+
+- Controllers handle MVC request flow, validation handoff, redirects, and view selection.
+- Services contain business rules for authentication, claims, dashboards, search, and approval transitions.
+- EF Core `DbContext` is used directly from services for simple, readable data access.
+- SQLite is used so the project can run quickly on a local machine with minimal setup.
+- ASP.NET Identity is intentionally omitted to keep authentication simple within the demo scope.
+- The current single-role user model is a demo simplification. A production system could model `Users`, `Roles`, and `UserRoles` separately.
+
+## Screenshots
+
+Screenshots can be added here when preparing the final interview deck:
+
+- Login
+- Dashboard
+- Claim list/detail
+- Approval review
+- Admin search
+
 ## Project Structure
 
 ```text

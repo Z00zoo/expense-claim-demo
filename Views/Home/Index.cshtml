@@ -61,8 +61,8 @@
                                 <tr>
                                     <td>@claim.ClaimNo</td>
                                     <td>@claim.Applicant?.DisplayName</td>
-                                    <td>@claim.ClaimDate.ToString("yyyy/MM/dd")</td>
-                                    <td class="text-end">@claim.Amount.ToString("N0")</td>
+                                    <td>@claim.ClaimDate.ToDisplayDate()</td>
+                                    <td class="text-end">@claim.Amount.ToDisplayCurrency()</td>
                                     <td><span class="badge @claim.Status.ToBadgeClass()">@claim.Status.ToDisplayName()</span></td>
                                     <td class="text-end">
                                         <a class="btn btn-sm btn-outline-primary" asp-controller="Approvals" asp-action="Review" asp-route-id="@claim.Id">處理</a>
@@ -107,8 +107,8 @@
                                             <a asp-controller="ExpenseClaims" asp-action="Details" asp-route-id="@claim.Id">@claim.ClaimNo</a>
                                         }
                                     </td>
-                                    <td>@claim.ClaimDate.ToString("yyyy/MM/dd")</td>
-                                    <td class="text-end">@claim.Amount.ToString("N0")</td>
+                                    <td>@claim.ClaimDate.ToDisplayDate()</td>
+                                    <td class="text-end">@claim.Amount.ToDisplayCurrency()</td>
                                     <td><span class="badge @claim.Status.ToBadgeClass()">@claim.Status.ToDisplayName()</span></td>
                                 </tr>
                             }

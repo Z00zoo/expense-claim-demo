@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Demo.Controllers;
 
 [Authorize]
-public class ExpenseClaimsController(ExpenseClaimService expenseClaimService) : Controller
+public class ExpenseClaimsController(ExpenseClaimService expenseClaimService, ILogger<ExpenseClaimsController> logger) : Controller
 {
     public async Task<IActionResult> Index()
     {
@@ -44,6 +44,8 @@ public class ExpenseClaimsController(ExpenseClaimService expenseClaimService) : 
         }
 
         var claim = await expenseClaimService.CreateDraftAsync(model, GetCurrentUserId());
+
+        logger.LogInformation("Claim {ClaimId} ({ClaimNo}) created by user {UserId}", claim.Id, claim.ClaimNo, GetCurrentUserId());
 
         TempData["StatusMessage"] = "請款草稿已建立。";
         return RedirectToAction(nameof(Details), new { id = claim.Id });
@@ -128,6 +130,8 @@ public class ExpenseClaimsController(ExpenseClaimService expenseClaimService) : 
         {
             return Forbid();
         }
+
+        logger.LogInformation("Claim {ClaimId} submitted by user {UserId}", id, GetCurrentUserId());
 
         TempData["StatusMessage"] = "請款單已送出，等待主管簽核。";
         return RedirectToAction(nameof(Details), new { id });

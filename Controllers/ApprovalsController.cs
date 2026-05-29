@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Demo.Controllers;
 
 [Authorize(Roles = $"{AppRoles.Approver},{AppRoles.Finance},{AppRoles.Admin}")]
-public class ApprovalsController(ApprovalService approvalService) : Controller
+public class ApprovalsController(ApprovalService approvalService, ILogger<ApprovalsController> logger) : Controller
 {
     public async Task<IActionResult> Pending()
     {
@@ -47,6 +47,15 @@ public class ApprovalsController(ApprovalService approvalService) : Controller
             return Forbid();
         }
 
+        if (GetCurrentRole() == AppRoles.Finance)
+        {
+            logger.LogInformation("Claim {ClaimId} finance-approved by user {UserId}", model.ExpenseClaimId, GetCurrentUserId());
+        }
+        else
+        {
+            logger.LogInformation("Claim {ClaimId} approved by user {UserId} with role {Role}", model.ExpenseClaimId, GetCurrentUserId(), GetCurrentRole());
+        }
+
         TempData["StatusMessage"] = "請款單已核准。";
         return RedirectToAction(nameof(Pending));
     }
@@ -77,6 +86,8 @@ public class ApprovalsController(ApprovalService approvalService) : Controller
             return Forbid();
         }
 
+        logger.LogInformation("Claim {ClaimId} rejected by user {UserId} with role {Role}", model.ExpenseClaimId, GetCurrentUserId(), GetCurrentRole());
+
         TempData["StatusMessage"] = "請款單已退回。";
         return RedirectToAction(nameof(Pending));
     }
@@ -100,6 +111,8 @@ public class ApprovalsController(ApprovalService approvalService) : Controller
         {
             return Forbid();
         }
+
+        logger.LogInformation("Claim {ClaimId} marked as paid by user {UserId}", model.ExpenseClaimId, GetCurrentUserId());
 
         TempData["StatusMessage"] = "請款單已標記付款完成。";
         return RedirectToAction(nameof(Pending));

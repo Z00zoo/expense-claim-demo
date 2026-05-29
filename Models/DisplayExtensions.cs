@@ -2,6 +2,26 @@ namespace Demo.Models;
 
 public static class DisplayExtensions
 {
+    public static string ToDisplayDate(this DateTime date)
+    {
+        return date.ToString("d");
+    }
+
+    public static string ToLocalDisplayDateTime(this DateTime dateTime)
+    {
+        return dateTime.ToLocalTime().ToString("g");
+    }
+
+    public static string ToLocalDisplayDateTime(this DateTime? dateTime)
+    {
+        return dateTime.HasValue ? dateTime.Value.ToLocalDisplayDateTime() : string.Empty;
+    }
+
+    public static string ToDisplayCurrency(this decimal amount)
+    {
+        return amount.ToString("C0");
+    }
+
     public static string ToDisplayName(this ExpenseClaimStatus status)
     {
         return status switch

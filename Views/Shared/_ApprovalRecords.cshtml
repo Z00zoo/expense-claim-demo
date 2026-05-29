@@ -20,7 +20,7 @@ else
                 @foreach (var record in Model.OrderBy(record => record.CreatedAt))
                 {
                     <tr>
-                        <td>@record.CreatedAt.ToLocalTime().ToString("yyyy/MM/dd HH:mm")</td>
+                        <td>@record.CreatedAt.ToLocalDisplayDateTime()</td>
                         <td>@record.Actor?.DisplayName</td>
                         <td>@record.Action.ToDisplayName()</td>
                         <td>@record.Comment</td>
